@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Realtime</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Dashboard SIGEMA</h2>
+    <p id="status">Status MQTT: <b>Disconnected</b></p>
+    <p><b>Suhu:</b> <span id="suhu">--</span> °C</p>
+    <p><b>Kelembapan:</b> <span id="kelembapan">--</span> %</p>
+
+    <script>
+      const client = mqtt.connect(
+        "wss://6c42610c24ec49d388827867a6bb4b71.s1.eu.hivemq.cloud:8884/mqtt",
+        {
+          clientId: "testSigemaWeb",
+          username: "sigema",
+          password: "Sigema2025",
+          clean: true,
+          connectTimeout: 4000,
+          reconnectPeriod: 1000,
+        }
+      );
+
+      client.on("connect", () => {
+        console.log("Connected to MQTT broker");
+        document.getElementById("status").innerHTML =
+          "Status MQTT: <b style='color:green;'>Connected</b>";
+        client.subscribe("sigema/data", function (err) {
+          if (!err) console.log("Subscribed to topic");
+        });
+      });
+
+      client.on("message", function (topic, message) {
+        const data = JSON.parse(message.toString());
+        console.log("Message:", data);
+
+        // TAMPILKAN DATA KE HTML
+        document.getElementById("suhu").textContent = data.suhu.toFixed(1);
+        document.getElementById("kelembapan").textContent =
+          data.kelembapan.toFixed(1);
+      });
+
+      client.on("error", (err) => {
+        console.error("Connection error: ", err);
+        client.end();
+      });
+
+      client.on("close", () => {
+        document.getElementById("status").innerHTML =
+          "Status MQTT: <b style='color:red;'>Disconnected</b>";
+      });
+    </script>
+  </body>
+</html>
