@@ -1,21 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Dashboard Realtime</title>
+    <title>SIGEMA - Silica Gel IoT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
-  <body>
-    <h2>Dashboard SIGEMA</h2>
-    <p id="status">Status MQTT: <b>Disconnected</b></p>
-    <p><b>Suhu:</b> <span id="suhu">--</span> °C</p>
-    <p><b>Kelembapan:</b> <span id="kelembapan">--</span> %</p>
+  <body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- HERO -->
+    <section
+      class="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 text-white text-center px-6"
+    >
+      <h1 class="text-5xl font-bold mb-4">SIGEMA</h1>
+      <p class="text-2xl max-w-2xl">
+        Silica Gel Effectiveness Monitoring & Assistant — IoT-based monitoring
+        for smarter humidity control.
+      </p>
+    </section>
+
+    <!-- ABOUT -->
+    <section
+      class="min-h-screen flex items-center justify-center bg-white px-8"
+    >
+      <div class="max-w-4xl text-center">
+        <h2 class="text-4xl font-bold mb-6">Tentang SIGEMA</h2>
+        <p class="text-lg leading-relaxed text-gray-700">
+          SIGEMA adalah solusi pemantauan efektivitas silica gel berbasis IoT.
+          Sistem ini mampu membaca suhu dan kelembapan secara real-time,
+          mengirimkan data ke cloud via MQTT, dan menampilkannya di dashboard
+          modern yang bisa dipantau dari mana saja.
+        </p>
+      </div>
+    </section>
+
+    <!-- CARA KERJA -->
+    <section
+      class="min-h-screen flex items-center justify-center bg-gray-100 px-8"
+    >
+      <div class="max-w-6xl w-full text-center">
+        <h2 class="text-4xl font-bold mb-12">Cara Kerja SIGEMA</h2>
+        <div class="grid md:grid-cols-3 gap-12">
+          <div>
+            <div class="text-5xl mb-4">🧪</div>
+            <h3 class="text-2xl font-semibold mb-2">Sensor Membaca</h3>
+            <p>
+              Mengukur suhu dan kelembapan ruang penyimpanan dengan akurasi
+              tinggi.
+            </p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">☁️</div>
+            <h3 class="text-2xl font-semibold mb-2">Kirim ke Cloud</h3>
+            <p>Data dikirim secara aman ke MQTT broker berbasis cloud.</p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">📉</div>
+            <h3 class="text-2xl font-semibold mb-2">Tampil Realtime</h3>
+            <p>
+              Dashboard menampilkan informasi suhu dan kelembapan secara
+              langsung.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REALTIME -->
+    <section
+      class="min-h-screen flex flex-col items-center justify-center bg-white px-6 text-center"
+    >
+      <h2 class="text-4xl font-bold mb-8">Data Realtime</h2>
+      <p id="status" class="text-xl font-medium mb-6">
+        Status MQTT: <b class="text-red-600">Disconnected</b>
+      </p>
+      <div class="flex gap-16 text-center">
+        <div class="bg-blue-100 p-8 rounded-xl shadow-lg w-60">
+          <h4 class="text-xl font-semibold text-blue-700 mb-2">Suhu</h4>
+          <p class="text-3xl"><span id="suhu">--</span> °C</p>
+        </div>
+        <div class="bg-blue-100 p-8 rounded-xl shadow-lg w-60">
+          <h4 class="text-xl font-semibold text-blue-700 mb-2">Kelembapan</h4>
+          <p class="text-3xl"><span id="kelembapan">--</span> %</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEVELOPER -->
+    <section
+      class="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-8"
+    >
+      <h2 class="text-4xl font-bold mb-12">Developer SIGEMA</h2>
+      <div class="grid md:grid-cols-3 gap-12 text-center">
+        <!-- DEVELOPER 1 -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <img
+            src="https://placehold.co/150x150"
+            alt="Evelly"
+            class="w-32 h-32 mx-auto rounded-full mb-4"
+          />
+          <h3 class="text-xl font-semibold">Evelly Khanzania</h3>
+          <p class="text-sm text-gray-600 mb-2">Ketua Tim & Developer</p>
+          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-xl">
+            <a href="https://instagram.com/" target="_blank">📷</a>
+            <a href="https://github.com/" target="_blank">🐱</a>
+            <a href="https://linkedin.com/" target="_blank">💼</a>
+          </div>
+        </div>
+        <!-- DEVELOPER 2 -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <img
+            src="https://placehold.co/150x150"
+            alt="Kenzie"
+            class="w-32 h-32 mx-auto rounded-full mb-4"
+          />
+          <h3 class="text-xl font-semibold">Raykanzie</h3>
+          <p class="text-sm text-gray-600 mb-2">Analis Riset & Penulis KTI</p>
+          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-xl">
+            <a href="https://instagram.com/" target="_blank">📷</a>
+            <a href="https://github.com/" target="_blank">🐱</a>
+            <a href="https://linkedin.com/" target="_blank">💼</a>
+          </div>
+        </div>
+        <!-- DEVELOPER 3 -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <img
+            src="https://placehold.co/150x150"
+            alt="Philip"
+            class="w-32 h-32 mx-auto rounded-full mb-4"
+          />
+          <h3 class="text-xl font-semibold">Philip</h3>
+          <p class="text-sm text-gray-600 mb-2">Editor & Tata Kelola Dokumen</p>
+          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-xl">
+            <a href="https://instagram.com/" target="_blank">📷</a>
+            <a href="https://github.com/" target="_blank">🐱</a>
+            <a href="https://linkedin.com/" target="_blank">💼</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-blue-900 text-white text-center py-6">
+      <p>&copy; 2025 SIGEMA | Silica Gel IoT Monitoring</p>
+    </footer>
 
     <script>
       const client = mqtt.connect(
