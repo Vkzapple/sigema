@@ -8,9 +8,8 @@ Sistem ini bertujuan untuk memantau efektivitas silica gel sebagai penyerap kele
 
 ## 🧩 Fitur Utama Modul Ini
 
-- Pemantauan kelembaban real-time menggunakan DHT11/DHT22
-- Indikator efektivitas silica gel (Efektif → Jenuh)
-- LED status indikator (Hijau: Aman, Merah: Butuh ganti)
+- Pemantauan kelembaban real-time menggunakan DHT22
+- Indikator estimasi efektivitas silica gel (1 hari, 5 hari, 3 hari.)
 - Monitoring visual melalui OLED display
 - Integrasi ke platform SIGEMA melalui koneksi MQTT + WiFi
 
