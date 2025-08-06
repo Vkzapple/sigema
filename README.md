@@ -12,8 +12,7 @@ Sistem ini bertujuan untuk memantau efektivitas silica gel sebagai penyerap kele
 - Indikator efektivitas silica gel (Efektif → Jenuh)
 - LED status indikator (Hijau: Aman, Merah: Butuh ganti)
 - Monitoring visual melalui OLED display
-- Integrasi ke platform SIGEMA melalui koneksi Wi-Fi
-- Logging data ke server (fitur opsional, tergantung backend)
+- Integrasi ke platform SIGEMA melalui koneksi MQTT + WiFi
 
 ---
 
@@ -23,7 +22,6 @@ Sistem ini bertujuan untuk memantau efektivitas silica gel sebagai penyerap kele
 
 - ESP32 Dev Board
 - DHT22 (Sensor Suhu & Kelembaban)
-- OLED I2C Display (0.96 inch)
 - Breadboard, jumper, resistor, dan power supply
 
 ### 🧪 Software:
