@@ -6,14 +6,12 @@
 #define DHTPIN 4     //ganti sesuai gpio/pin digital  
 #define DHTTYPE DHT22   
 
-const char* ssid = "wifi";
-const char* password = "Password_Wifi";
-
-const char* mqtt_server = "public_broker";
-const int mqtt_port = 8883;  
-
-const char* mqtt_user = "Usn_broker";
-const char* mqtt_pass = "PW_broker";
+const char* ssid = "WIFI SMKN 1";
+const char* password = "gurusmkn1";
+const char* mqtt_server = "6c42610c24ec49d388827867a6bb4b71.s1.eu.hivemq.cloud";
+const int mqtt_port = 8883;
+const char* mqtt_user = "sigema";
+const char* mqtt_pass = "Sigema2025";
 
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClientSecure espClient;
