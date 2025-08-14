@@ -20,9 +20,9 @@ client.on("connect", () => {
 
 client.on("message", (topic, message) => {
   const payload = message.toString();
-  if (topic === "sigema/data") {
-    lastUpdateTime = Date.now();
-  }
+
+  if (topic === "sigema/data") lastUpdateTime = Date.now();
+
   if (topic === "sigema/status") {
     if (payload === "online") lastUpdateTime = Date.now();
     document.getElementById("status-alat").innerHTML =
@@ -34,35 +34,49 @@ client.on("message", (topic, message) => {
 
   try {
     const data = JSON.parse(payload);
+
+    // Suhu
     if (data.suhu !== undefined)
-      document.getElementById("suhu").textContent = data.suhu.toFixed(1);
+      document.getElementById("suhu").textContent = parseFloat(
+        data.suhu
+      ).toFixed(1);
+
+    // Kelembapan
     if (data.kelembapan !== undefined)
-      document.getElementById("kelembapan").textContent =
-        data.kelembapan.toFixed(1);
+      document.getElementById("kelembapan").textContent = parseFloat(
+        data.kelembapan
+      ).toFixed(1);
+
+    // Last Update
+    if (data.last_update !== undefined)
+      document.getElementById("last-update-time").textContent =
+        "Last Update: " + data.last_update;
+
+    // Estimasi
+    let estimasiText = "--";
+    if (data.kelembapan !== undefined) {
+      const kelembapan = parseFloat(data.kelembapan);
+      const estJam = data.estimasi_jam;
+
+      if (kelembapan < 59) {
+        estimasiText = "Kondisi Sangat Baik";
+      } else if (kelembapan >= 59 && kelembapan <= 69) {
+        estimasiText = "Normal/Stabil";
+      } else if (kelembapan >= 70) {
+        if (typeof estJam === "number") {
+          estimasiText =
+            estJam > 24 ? "Silica Gel Stabil" : estJam.toFixed(1) + " jam";
+        } else {
+          estimasiText = estJam || "--";
+        }
+      }
+    }
+    document.getElementById("estimasi").textContent =
+      "Estimasi: " + estimasiText;
   } catch (err) {
     console.error("⚠️ Error parsing message:", err.message);
   }
 });
-
-client.on("error", (err) => console.error("⚠️ MQTT Error:", err.message));
-client.on("close", () => {
-  document.getElementById("status").innerHTML =
-    "Status MQTT: <b style='color:red;'>Disconnected</b>";
-});
-let lastUpdateTime = Date.now();
-
-function checkAlatTimeout() {
-  const now = Date.now();
-  const diff = now - lastUpdateTime;
-  const timeoutThreshold = 10000;
-
-  if (diff > timeoutThreshold) {
-    document.getElementById("status-alat").innerHTML =
-      "Status Alat: <b style='color:red;'>Offline (Timeout)</b>";
-  }
-}
-
-setInterval(checkAlatTimeout, 5000);
 
 window.addEventListener("scroll", () => {
   const navbar = document.getElementById("navbar");
@@ -79,5 +93,3 @@ const mobileMenu = document.getElementById("mobile-menu");
 menuBtn.addEventListener("click", () => {
   mobileMenu.classList.toggle("hidden");
 });
-document.getElementById("last-update").textContent =
-  "Terakhir update: " + new Date().toLocaleTimeString();
