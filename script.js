@@ -11,6 +11,9 @@ const client = mqtt.connect(
   }
 );
 
+let lastUpdateTime = 0;
+
+// Subscribe MQTT
 client.on("connect", () => {
   document.getElementById("status").innerHTML =
     "Status MQTT: <b style='color:green;'>Connected</b>";
@@ -35,49 +38,53 @@ client.on("message", (topic, message) => {
   try {
     const data = JSON.parse(payload);
 
-    // Suhu
+    // Update suhu
     if (data.suhu !== undefined)
       document.getElementById("suhu").textContent = parseFloat(
         data.suhu
       ).toFixed(1);
 
-    // Kelembapan
-    if (data.kelembapan !== undefined)
-      document.getElementById("kelembapan").textContent = parseFloat(
-        data.kelembapan
-      ).toFixed(1);
+    // Update kelembapan
+    if (data.kelembapan !== undefined) {
+      const kelembapan = parseFloat(data.kelembapan);
+      document.getElementById("kelembapan").textContent = kelembapan.toFixed(1);
+
+      // Hitung estimasi ganti silica gel
+      let estimasiText = "--";
+      let gantiText = "--";
+      const now = new Date();
+
+      if (kelembapan >= 80) {
+        estimasiText = "Segera ganti silica gel!";
+        gantiText = "Sekarang juga!";
+      } else if (kelembapan >= 70 && kelembapan < 80) {
+        estimasiText = "Silica gel mulai jenuh, estimasi ganti 3 hari lagi";
+        // Hitung jam ganti +3 hari
+        now.setDate(now.getDate() + 3);
+        const jam = now.getHours().toString().padStart(2, "0");
+        const menit = now.getMinutes().toString().padStart(2, "0");
+        gantiText = `${jam}:${menit} (3 hari dari sekarang)`;
+      } else {
+        estimasiText = "Kondisi aman, kelembapan stabil";
+        gantiText = "Belum perlu diganti";
+      }
+
+      document.getElementById("estimasi").textContent =
+        "Estimasi: " + estimasiText;
+      document.getElementById("ganti-silica").textContent =
+        "Ganti silica gel pada: " + gantiText;
+    }
 
     // Last Update
     if (data.last_update !== undefined)
       document.getElementById("last-update-time").textContent =
         "Last Update: " + data.last_update;
-
-    // Estimasi
-    let estimasiText = "--";
-    if (data.kelembapan !== undefined) {
-      const kelembapan = parseFloat(data.kelembapan);
-      const estJam = data.estimasi_jam;
-
-      if (kelembapan < 59) {
-        estimasiText = "Kondisi Sangat Baik";
-      } else if (kelembapan >= 59 && kelembapan <= 69) {
-        estimasiText = "Normal/Stabil";
-      } else if (kelembapan >= 70) {
-        if (typeof estJam === "number") {
-          estimasiText =
-            estJam > 24 ? "Silica Gel Stabil" : estJam.toFixed(1) + " jam";
-        } else {
-          estimasiText = estJam || "--";
-        }
-      }
-    }
-    document.getElementById("estimasi").textContent =
-      "Estimasi: " + estimasiText;
   } catch (err) {
     console.error("⚠️ Error parsing message:", err.message);
   }
 });
 
+// Navbar scroll effect
 window.addEventListener("scroll", () => {
   const navbar = document.getElementById("navbar");
   if (window.scrollY > 20) {
@@ -87,9 +94,9 @@ window.addEventListener("scroll", () => {
   }
 });
 
+// Mobile menu toggle
 const menuBtn = document.getElementById("menu-btn");
 const mobileMenu = document.getElementById("mobile-menu");
-
 menuBtn.addEventListener("click", () => {
   mobileMenu.classList.toggle("hidden");
 });
