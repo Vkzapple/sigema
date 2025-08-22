@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <title>SIGEMA</title>
@@ -7,130 +7,285 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
     <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Navbar states */
       .navbar-scrolled {
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(10px);
         border-bottom: 1px solid #e5e7eb;
       }
+      .navbar-scrolled .nav-link,
+      .navbar-scrolled .brand {
+        color: #111827 !important;
+      }
+      .navbar-scrolled .hamburger {
+        color: #111827 !important;
+      }
+
+      /* Mobile menu slide down when shown */
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #mobile-menu:not(.hidden) {
+        animation: slideDown 0.25s ease-out;
+      }
+
+      /* Fancy gradient blobs in hero */
+      .blob {
+        filter: blur(60px);
+        opacity: 0.6;
+      }
+      @keyframes floatSlow {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-12px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .float-slow {
+        animation: floatSlow 8s ease-in-out infinite;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in-up {
+        animation: fadeInUp 0.8s ease-out both;
+      }
     </style>
   </head>
-  <body class="bg-gray-50 text-gray-800 font-sans">
+  <body class="bg-slate-50 text-slate-800 font-sans">
     <!-- NAVBAR -->
     <header
       id="navbar"
       class="fixed top-0 left-0 w-full z-50 transition duration-300"
     >
       <div
-        class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"
+        class="max-w-7xl mx-auto flex items-center justify-between px-5 md:px-6 py-4"
       >
         <div class="flex items-center gap-3">
-          <img src="src/logo.jpg" alt="SIGEMA Logo" class="h-8 w-8" />
-          <span class="text-lg font-semibold text-white md:text-gray-800"
+          <img src="src/logo.jpg" alt="SIGEMA Logo" class="h-9 w-9 rounded" />
+          <span
+            class="brand text-lg md:text-xl font-semibold text-white select-none"
             >SIGEMA</span
           >
         </div>
-        <nav
-          class="hidden md:flex gap-6 text-sm font-medium text-white md:text-gray-800"
-        >
-          <a href="#about" class="hover:underline">Tentang</a>
-          <a href="#work" class="hover:underline">Cara Kerja</a>
-          <a href="#realtime" class="hover:underline">Realtime</a>
-          <a href="#developer" class="hover:underline">Developer</a>
-        </nav>
-        <button id="menu-btn" class="md:hidden text-white focus:outline-none">
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium">
+          <a href="#about" class="nav-link text-white hover:opacity-90"
+            >Tentang</a
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <a href="#work" class="nav-link text-white hover:opacity-90"
+            >Cara Kerja</a
+          >
+          <a href="#realtime" class="nav-link text-white hover:opacity-90"
+            >Realtime</a
+          >
+          <!-- <a href="#mitra" class="nav-link text-white hover:opacity-90"
+            >Mitra</a
+          > -->
+          <a href="#legalitas" class="nav-link text-white hover:opacity-90"
+            >Legalitas</a
+          >
+          <a href="#developer" class="nav-link text-white hover:opacity-90"
+            >Developer</a
+          >
+        </nav>
+        <button
+          id="menu-btn"
+          class="md:hidden hamburger text-white focus:outline-none"
+          aria-label="Buka menu"
+        >
+          <i class="fa-solid fa-bars text-2xl"></i>
         </button>
       </div>
-      <div id="mobile-menu" class="hidden md:hidden bg-white shadow-md">
-        <a
-          href="#about"
-          class="block px-6 py-3 border-b text-gray-700 hover:bg-gray-100"
-          >Tentang</a
-        >
-        <a
-          href="#work"
-          class="block px-6 py-3 border-b text-gray-700 hover:bg-gray-100"
-          >Cara Kerja</a
-        >
-        <a
-          href="#realtime"
-          class="block px-6 py-3 border-b text-gray-700 hover:bg-gray-100"
-          >Realtime</a
-        >
-        <a
-          href="#developer"
-          class="block px-6 py-3 text-gray-700 hover:bg-gray-100"
-          >Developer</a
-        >
+     <!-- Mobile dropdown -->
+<div id="mobile-menu"
+  class="hidden md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-lg rounded-b-2xl animate-fadeIn">
+  <div class="flex flex-col py-4 px-6 space-y-2">
+    <a href="#about" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Tentang</a>
+    <a href="#work" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Cara Kerja</a>
+    <a href="#realtime" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Realtime</a>
+    <a href="#mitra" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Mitra</a>
+    <a href="#legalitas" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Legalitas</a>
+    <a href="#developer" class="block py-3 text-slate-700 font-medium hover:text-blue-600 transition">Developer</a>
+  </div>
+</div>
+
       </div>
     </header>
 
     <!-- HERO -->
     <section
-      class="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 text-white text-center px-6 pt-24"
+      class="relative h-[96vh] min-h-[640px] flex items-center overflow-hidden bg-gradient-to-br from-blue-950 via-blue-800 to-blue-600 text-white"
     >
-      <h1 class="text-5xl font-bold mb-4">SIGEMA</h1>
-      <p class="text-2xl max-w-2xl">
-        Silica Gel Effectiveness Monitoring & Assistant — IoT based monitoring
-        for smarter humidity control.
-      </p>
+      <!-- Decorative blobs -->
+      <div
+        class="absolute -top-16 -left-24 h-64 w-64 bg-indigo-400 rounded-full blob float-slow"
+      ></div>
+      <div
+        class="absolute bottom-[-40px] right-[-30px] h-72 w-72 bg-cyan-400 rounded-full blob float-slow"
+        style="animation-delay: -2s"
+      ></div>
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,.10),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,.08),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(255,255,255,.06),transparent_35%)]"
+      ></div>
+
+      <div
+        class="relative z-10 max-w-7xl mx-auto px-6 pt-24 w-full grid md:grid-cols-2 gap-10 items-center"
+      >
+        <div class="text-center md:text-left">
+          <span
+            class="inline-flex items-center gap-2 text-xs uppercase tracking-widest bg-white/10 border border-white/20 px-3 py-1 rounded-full mb-4"
+          >
+            <i class="fa-solid fa-sparkles"></i> IoT – Silica Gel Monitoring
+          </span>
+          <h1
+            class="text-4xl sm:text-5xl font-extrabold leading-tight fade-in-up"
+          >
+            SIGEMA
+          </h1>
+          <p
+            class="mt-4 text-lg sm:text-xl text-white/90 fade-in-up"
+            style="animation-delay: 0.1s"
+          >
+            Silica Gel Effectiveness Monitoring & Assistant — pemantauan suhu &
+            kelembapan real‑time dengan MQTT untuk kontrol kelembapan yang lebih
+            cerdas.
+          </p>
+          <div
+            class="mt-7 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start"
+          >
+            <a
+              href="#about"
+              class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-blue-700 font-semibold shadow hover:bg-slate-100 transition fade-in-up"
+              style="animation-delay: 0.2s"
+            >
+              Pelajari Lebih Lanjut
+            </a>
+            <a
+              href="#realtime"
+              class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-white/40 text-white hover:bg-white/10 transition backdrop-blur fade-in-up"
+              style="animation-delay: 0.25s"
+            >
+              Lihat Realtime
+            </a>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="absolute -inset-4 rounded-3xl bg-white/10 blur-xl"></div>
+          <img
+            src="src/sigema-ilustrasi.png"
+            alt="Foto perangkat SIGEMA"
+            class="relative w-full max-w-md md:max-w-lg mx-auto rounded-2xl shadow-2xl ring-1 ring-white/20"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- ABOUT -->
     <section
       id="about"
-      class="min-h-screen flex items-center justify-center bg-white px-8"
+      class="scroll-mt-24 min-h-[60vh] flex items-center bg-white"
     >
-      <div class="max-w-4xl text-center">
-        <h2 class="text-4xl font-bold mb-6">Tentang SIGEMA</h2>
-        <p class="text-lg leading-relaxed text-gray-700">
-          SIGEMA adalah sistem pemantauan berbasis IoT yang digunakan untuk
-          mengukur efektivitas silica gel melalui pembacaan suhu dan kelembapan
-          secara real-time. Sistem ini memanfaatkan konektivitas MQTT untuk
-          menyampaikan data sensor ke platform visualisasi web.
-        </p>
+      <div
+        class="max-w-6xl mx-auto px-6 py-16 text-center md:text-left grid md:grid-cols-2 gap-10"
+      >
+        <div>
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Tentang SIGEMA</h2>
+          <p class="text-lg leading-relaxed text-slate-700">
+            SIGEMA adalah sistem pemantauan berbasis IoT untuk mengukur
+            efektivitas silica gel melalui pembacaan suhu dan kelembapan secara
+            real‑time. Data dikirim ke cloud via MQTT dan divisualisasikan di
+            dashboard web agar keputusan penggantian silica gel lebih akurat.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div
+            class="p-5 rounded-xl bg-slate-50 border border-slate-200 shadow-sm"
+          >
+            <p class="text-4xl">📡</p>
+            <p class="mt-2 font-semibold">MQTT Cloud</p>
+            <p class="text-sm text-slate-600">Koneksi aman & andal.</p>
+          </div>
+          <div
+            class="p-5 rounded-xl bg-slate-50 border border-slate-200 shadow-sm"
+          >
+            <p class="text-4xl">⏱️</p>
+            <p class="mt-2 font-semibold">Realtime</p>
+            <p class="text-sm text-slate-600">Pemantauan langsung.</p>
+          </div>
+          <div
+            class="p-5 rounded-xl bg-slate-50 border border-slate-200 shadow-sm"
+          >
+            <p class="text-4xl">📊</p>
+            <p class="mt-2 font-semibold">Akurat</p>
+            <p class="text-sm text-slate-600">Keputusan berbasis data.</p>
+          </div>
+          <div
+            class="p-5 rounded-xl bg-slate-50 border border-slate-200 shadow-sm"
+          >
+            <p class="text-4xl">🧪</p>
+            <p class="mt-2 font-semibold">Teruji</p>
+            <p class="text-sm text-slate-600">Sudah uji coba mitra.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- CARA KERJA -->
-    <section
-      class="min-h-screen flex items-center justify-center bg-gray-100 px-8"
-    >
-      <div class="max-w-6xl w-full text-center">
-        <h2 class="text-4xl font-bold mb-12">Cara Kerja SIGEMA</h2>
-        <div class="grid md:grid-cols-3 gap-12">
-          <div>
+    <section id="work" class="scroll-mt-24 bg-slate-50">
+      <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12">Cara Kerja SIGEMA</h2>
+        <div class="grid md:grid-cols-3 gap-6 md:gap-10">
+          <div
+            class="p-8 rounded-2xl bg-white shadow-sm border border-slate-200"
+          >
             <div class="text-5xl mb-4">🧪</div>
             <h3 class="text-2xl font-semibold mb-2">Sensor Membaca</h3>
-            <p>
-              Mengukur suhu dan kelembapan ruang penyimpanan dengan akurasi
-              tinggi.
+            <p class="text-slate-600">
+              Mengukur suhu & kelembapan dengan akurasi tinggi.
             </p>
           </div>
-          <div>
+          <div
+            class="p-8 rounded-2xl bg-white shadow-sm border border-slate-200"
+          >
             <div class="text-5xl mb-4">☁️</div>
             <h3 class="text-2xl font-semibold mb-2">Kirim ke Cloud</h3>
-            <p>Data dikirim secara aman ke MQTT broker berbasis cloud.</p>
+            <p class="text-slate-600">Data dikirim aman ke broker MQTT.</p>
           </div>
-          <div>
+          <div
+            class="p-8 rounded-2xl bg-white shadow-sm border border-slate-200"
+          >
             <div class="text-5xl mb-4">📉</div>
             <h3 class="text-2xl font-semibold mb-2">Tampil Realtime</h3>
-            <p>
-              Dashboard menampilkan informasi suhu dan kelembapan secara
-              langsung.
+            <p class="text-slate-600">
+              Dashboard menampilkan suhu & RH secara langsung.
             </p>
           </div>
         </div>
@@ -140,124 +295,279 @@
     <!-- REALTIME -->
     <section
       id="realtime"
-      class="min-h-screen flex flex-col items-center justify-center bg-white px-6 text-center"
+      class="scroll-mt-24 bg-gradient-to-br from-blue-50 to-blue-100"
     >
-      <h2 class="text-4xl font-bold mb-8">Data Realtime</h2>
-      <p id="status" class="text-xl font-medium mb-2">
-        Status MQTT: <b class="text-red-600">Disconnected</b>
-      </p>
-      <p id="status-alat" class="text-xl font-medium mb-4">
-        Status Alat: <b class="text-gray-500">Menunggu...</b>
-      </p>
-      <p id="last-update-time" class="text-sm text-gray-500 mb-6">
-        Last Update: --
-      </p>
-      <div class="flex flex-col md:flex-row gap-6 md:gap-16 text-center">
-        <div class="bg-blue-100 p-8 rounded-xl shadow-lg w-60 mx-auto">
-          <h4 class="text-xl font-semibold text-blue-700 mb-2">Suhu</h4>
-          <p class="text-3xl"><span id="suhu">--</span> °C</p>
+      <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-8">Data Realtime</h2>
+
+        <!-- Status -->
+        <div class="mb-6 space-y-2">
+          <p id="status" class="text-lg font-medium">
+            Status MQTT: <b class="text-red-600">Disconnected</b>
+          </p>
+          <p id="status-alat" class="text-lg font-medium">
+            Status Alat: <b class="text-slate-500">Menunggu...</b>
+          </p>
+          <p id="last-update-time" class="text-sm text-slate-600">
+            Last Update: --
+          </p>
         </div>
-        <div class="bg-blue-100 p-8 rounded-xl shadow-lg w-60 mx-auto">
-          <h4 class="text-xl font-semibold text-blue-700 mb-2">Kelembapan</h4>
-          <p class="text-3xl"><span id="kelembapan">--</span> %</p>
+
+        <!-- Data Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div
+            class="group relative bg-white p-8 rounded-2xl shadow-lg border border-slate-200 transition hover:shadow-xl"
+          >
+            <div
+              class="absolute -top-4 -right-4 h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center shadow-md"
+            >
+              🌡️
+            </div>
+            <h4 class="text-xl font-semibold text-slate-700 mb-2">Suhu</h4>
+            <!-- angka utama -->
+            <span
+              id="suhu"
+              class="block text-5xl font-extrabold text-blue-700 transition-transform duration-200 group-hover:scale-110"
+              >--</span
+            >
+            <p class="text-slate-500 mt-1">°C</p>
+          </div>
+          <div
+            class="group relative bg-white p-8 rounded-2xl shadow-lg border border-slate-200 transition hover:shadow-xl"
+          >
+            <div
+              class="absolute -top-4 -right-4 h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center shadow-md"
+            >
+              💧
+            </div>
+            <h4 class="text-xl font-semibold text-slate-700 mb-2">
+              Kelembapan
+            </h4>
+            <!-- angka utama -->
+            <span
+              id="kelembapan"
+              class="block text-5xl font-extrabold text-blue-700 transition-transform duration-200 group-hover:scale-110"
+              >--</span
+            >
+            <p class="text-slate-500 mt-1">%</p>
+          </div>
+        </div>
+
+        <!-- Estimasi -->
+        <div class="mt-8 space-y-2">
+          <div id="estimasi" class="text-lg font-medium">Estimasi: --</div>
+          <div id="ganti-silica" class="text-lg font-medium">
+            Ganti silica gel pada: --
+          </div>
         </div>
       </div>
-    <div id="estimasi">Estimasi: --</div>
-    <div id="ganti-silica">Ganti silica gel pada: --</div>
-  </div>
+    </section>
+
+    <!-- MITRA
+    <section id="mitra" class="scroll-mt-24 bg-slate-50">
+      <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">
+          Mitra Uji Coba SIGEMA
+        </h2>
+        <p class="text-lg text-slate-700 max-w-2xl mx-auto mb-10">
+          SIGEMA telah dipakai uji coba di beberapa tempat (mitra). Berikut
+          sebagian yang telah berkolaborasi.
+        </p>
+        <div
+          class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 items-center"
+        >
+          <img
+            src="src/mitra1.png"
+            alt="Mitra 1"
+            class="h-16 md:h-20 mx-auto opacity-80 hover:opacity-100 transition"
+          />
+          <img
+            src="src/mitra2.png"
+            alt="Mitra 2"
+            class="h-16 md:h-20 mx-auto opacity-80 hover:opacity-100 transition"
+          />
+          <img
+            src="src/mitra3.png"
+            alt="Mitra 3"
+            class="h-16 md:h-20 mx-auto opacity-80 hover:opacity-100 transition"
+          />
+          <img
+            src="src/mitra4.png"
+            alt="Mitra 4"
+            class="h-16 md:h-20 mx-auto opacity-80 hover:opacity-100 transition"
+          />
+        </div>
+      </div>
+    </section> -->
+
+    <!-- LEGALITAS -->
+    <section id="legalitas" class="scroll-mt-24 bg-white">
+      <div class="max-w-5xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">Legalitas SIGEMA</h2>
+        <p class="text-lg text-slate-700 max-w-2xl mx-auto mb-10">
+          SIGEMA telah <span class="font-semibold">terdaftar HAK CIPTA</span>.
+          Berikut bukti dokumentasi legalitas.
+        </p>
+        <div
+          class="mx-auto max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow"
+        >
+          <img
+            src="src/HakCipta.png"
+            alt="Sertifikat HAK CIPTA"
+            class="w-full rounded-lg"
+          />
+          <div
+            class="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm font-semibold"
+          >
+            <i class="fa-solid fa-shield"></i>
+            Terdaftar HAK CIPTA 2025
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- DEVELOPER -->
-    <section
-      id="developer"
-      class="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-8"
-    >
-      <h2 class="text-4xl font-bold mb-12">Tim SIGEMA</h2>
-      <div class="grid md:grid-cols-3 gap-12 text-center">
-        <div class="bg-white p-6 rounded-xl shadow-md">
-          <img
-            src="src/epel.jpeg"
-            alt="Evelly"
-            class="w-32 h-32 mx-auto rounded-full mb-4"
-          />
-          <h3 class="text-xl font-semibold">Evelly Khanzania</h3>
-          <p class="text-sm text-gray-600 mb-2">Ketua Tim dan IoT Developer</p>
-          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-sm">
-            <a href="#">Instagram</a>
-            <a href="#">GitHub</a>
-            <a href="#">LinkedIn</a>
+    <section id="developer" class="scroll-mt-24 bg-slate-50">
+      <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12">Tim SIGEMA</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Card 1 -->
+          <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+            <img
+              src="src/epel.jpeg"
+              alt="Evelly"
+              class="w-28 h-28 mx-auto rounded-full object-cover mb-4 shadow"
+            />
+            <h3 class="text-xl font-semibold">Evelly Khanzania</h3>
+            <p class="text-sm text-slate-600 mb-3">Ketua Tim & IoT Developer</p>
+            <div class="flex justify-center gap-5 text-xl">
+              <a
+                href="#"
+                aria-label="Instagram"
+                class="text-pink-600 hover:scale-110 transition"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="GitHub"
+                class="text-slate-800 hover:scale-110 transition"
+                ><i class="fab fa-github"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                class="text-sky-700 hover:scale-110 transition"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+            </div>
           </div>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow-md">
-          <img
-            src="src/kenji.jpeg"
-            alt="Kenzie"
-            class="w-32 h-32 mx-auto rounded-full mb-4"
-          />
-          <h3 class="text-xl font-semibold">Raykenzie Nazaru F.</h3>
-          <p class="text-sm text-gray-600 mb-2">
-            Analis Riset dan Penulis Karya Tulis Ilmiah
-          </p>
-          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-sm">
-            <a href="#">Instagram</a>
-            <a href="#">GitHub</a>
-            <a href="#">LinkedIn</a>
+          <!-- Card 2 -->
+          <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+            <img
+              src="src/kenji.jpeg"
+              alt="Raykenzie"
+              class="w-28 h-28 mx-auto rounded-full object-cover mb-4 shadow"
+            />
+            <h3 class="text-xl font-semibold">Raykenzie Nazaru F.</h3>
+            <p class="text-sm text-slate-600 mb-3">
+              Analis Riset & Penulis KTI
+            </p>
+            <div class="flex justify-center gap-5 text-xl">
+              <a
+                href="#"
+                aria-label="Instagram"
+                class="text-pink-600 hover:scale-110 transition"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="GitHub"
+                class="text-slate-800 hover:scale-110 transition"
+                ><i class="fab fa-github"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                class="text-sky-700 hover:scale-110 transition"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+            </div>
           </div>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow-md">
-          <img
-            src="src/philiip.jpeg"
-            alt="philip"
-            class="w-32 h-32 mx-auto rounded-full mb-4"
-          />
-          <h3 class="text-xl font-semibold">Philip Rahmat</h3>
-          <p class="text-sm text-gray-600 mb-2">
-            Editor dan Tata Kelola Dokumen
-          </p>
-          <div class="flex justify-center gap-4 mt-2 text-blue-600 text-sm">
-            <a href="#">Instagram</a>
-            <a href="#">GitHub</a>
-            <a href="#">LinkedIn</a>
+          <!-- Card 3 -->
+          <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+            <img
+              src="src/philiip.jpeg"
+              alt="Philip"
+              class="w-28 h-28 mx-auto rounded-full object-cover mb-4 shadow"
+            />
+            <h3 class="text-xl font-semibold">Philip Rahmat</h3>
+            <p class="text-sm text-slate-600 mb-3">
+              Editor & Tata Kelola Dokumen
+            </p>
+            <div class="flex justify-center gap-5 text-xl">
+              <a
+                href="#"
+                aria-label="Instagram"
+                class="text-pink-600 hover:scale-110 transition"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="GitHub"
+                class="text-slate-800 hover:scale-110 transition"
+                ><i class="fab fa-github"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                class="text-sky-700 hover:scale-110 transition"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-blue-900 text-white px-6 py-10">
-      <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
+    <footer class="bg-blue-950 text-white">
+      <div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-10">
         <div>
           <div class="flex items-center gap-2 mb-4">
-            <img src="src/logo.jpg" alt="Logo" class="h-8 w-8" />
+            <img src="src/logo.jpg" alt="Logo" class="h-8 w-8 rounded" />
             <span class="text-xl font-semibold">SIGEMA</span>
           </div>
-          <p class="text-sm text-gray-300 leading-relaxed">
-            SIGEMA adalah sistem monitoring IoT yang dirancang untuk membantu
-            pengelolaan efektivitas silica gel dalam berbagai lingkungan
-            penyimpanan.
+          <p class="text-sm text-blue-100 leading-relaxed">
+            SIGEMA adalah sistem monitoring IoT untuk membantu pengelolaan
+            efektivitas silica gel dalam berbagai lingkungan penyimpanan.
           </p>
         </div>
         <div>
           <h4 class="text-lg font-semibold mb-4">Navigasi</h4>
-          <ul class="space-y-2 text-sm text-gray-300">
+          <ul class="space-y-2 text-sm text-blue-100">
             <li><a href="#about" class="hover:text-white">Tentang</a></li>
             <li><a href="#work" class="hover:text-white">Cara Kerja</a></li>
             <li>
               <a href="#realtime" class="hover:text-white">Data Realtime</a>
             </li>
+            <li><a href="#mitra" class="hover:text-white">Mitra</a></li>
+            <li><a href="#legalitas" class="hover:text-white">Legalitas</a></li>
             <li><a href="#developer" class="hover:text-white">Developer</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-lg font-semibold mb-4">Informasi Kontak</h4>
-          <p class="text-sm text-gray-300">Email:</p>
-          <p class="text-sm text-gray-300">Telp:</p>
+          <p class="text-sm text-blue-100">Email:</p>
+          <p class="text-sm text-blue-100">Telp:</p>
         </div>
       </div>
-      <div class="text-center text-sm text-gray-400 mt-10">
+      <div
+        class="text-center text-sm text-blue-200 border-t border-white/10 py-4"
+      >
         &copy; 2025 SIGEMA. All rights reserved.
       </div>
     </footer>
-    <script src="script.js"></script>
   </body>
+  <!-- Scripts -->
+  <script src="script.js"></script>
 </html>
