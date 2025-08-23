@@ -75,7 +75,6 @@ client.on("message", (topic, message) => {
         "Ganti silica gel pada: " + gantiText;
     }
 
-    // Last Update
     if (data.last_update !== undefined)
       document.getElementById("last-update-time").textContent =
         "Last Update: " + data.last_update;
