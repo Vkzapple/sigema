@@ -44,12 +44,12 @@ client.on("message", (topic, message) => {
         data.suhu
       ).toFixed(1);
 
-    // Update kelembapan
+    // update kelembapan, tanya aja lebih lanjut kalo kurang paham ya zil
     if (data.kelembapan !== undefined) {
       const kelembapan = parseFloat(data.kelembapan);
       document.getElementById("kelembapan").textContent = kelembapan.toFixed(1);
 
-      // Hitung estimasi ganti silica gel
+      // rumus estimasi ganti silica gel, ada di KTI jabarannya
       let estimasiText = "--";
       let gantiText = "--";
       const now = new Date();
@@ -59,7 +59,7 @@ client.on("message", (topic, message) => {
         gantiText = "Sekarang juga!";
       } else if (kelembapan >= 70 && kelembapan < 80) {
         estimasiText = "Silica gel mulai jenuh, estimasi ganti 3 hari lagi";
-        // Hitung jam ganti +3 hari
+        // Hitung jam ganti kurleb 3 harian
         now.setDate(now.getDate() + 3);
         const jam = now.getHours().toString().padStart(2, "0");
         const menit = now.getMinutes().toString().padStart(2, "0");
