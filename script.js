@@ -99,3 +99,18 @@ const mobileMenu = document.getElementById("mobile-menu");
 menuBtn.addEventListener("click", () => {
   mobileMenu.classList.toggle("hidden");
 });
+// --- MITRA SLIDER ---
+const slider = document.querySelector("#mitra-slider .animate-scroll");
+
+// Gandakan isi slider biar looping mulus
+slider.innerHTML += slider.innerHTML;
+
+// Pause kalau mouse hover
+slider.addEventListener("mouseenter", () => {
+  slider.style.animationPlayState = "paused";
+});
+
+// Lanjut jalan lagi kalau mouse keluar
+slider.addEventListener("mouseleave", () => {
+  slider.style.animationPlayState = "running";
+});
